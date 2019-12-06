@@ -1,6 +1,0 @@
-[submodule "cpython"]
-	path = cpython
-	url = ssh://git@gitlab.pinet.vpn:5222/pykernel/cpython.git
-[submodule "linux"]
-	path = linux
-	url = ssh://git@gitlab.pinet.vpn:5222/pykernel/linux.git

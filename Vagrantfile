@@ -33,28 +33,37 @@ Vagrant.configure('2') do |config|
 		s.inline = 'echo Setting up machine name'
 
 		config.vm.provider :vmware_fusion do |v, override|
-			v.vmx['displayname'] = "Buildroot #{RELEASE}"
+			v.vmx['displayname'] = "Pykernel Buildroot #{RELEASE}"
 		end
 
 		config.vm.provider :virtualbox do |v, override|
-			v.name = "Buildroot #{RELEASE}"
+			v.name = "Pykernel Buildroot #{RELEASE}"
 		end
 	end
 
 	config.vm.provision 'shell', privileged: true, inline:
 		"sed -i 's|deb http://us.archive.ubuntu.com/ubuntu/|deb mirror://mirrors.ubuntu.com/mirrors.txt|g' /etc/apt/sources.list
+		sed -i '192.168.0.3 gitlab.pinet.home' /etc/hosts
 		dpkg --add-architecture i386
 		apt-get -q update
 		apt-get purge -q -y snapd lxcfs lxd ubuntu-core-launcher snap-confine
 		apt-get -q -y install build-essential libncurses5-dev \
-			git bzr cvs mercurial subversion libc6:i386 unzip bc
+			git bzr cvs mercurial subversion libc6:i386 unzip bc \
+			gcc-arm-linux-gnueabi
 		apt-get -q -y autoremove
 		apt-get -q -y clean
 		update-locale LC_ALL=C"
 
+	config.vm.provision 'file', source: '~/.ssh/pykernel_deploy_key', destination: '$HOME/.ssh/pykernel_deploy_key'
+
 	config.vm.provision 'shell', privileged: false, inline:
 		"echo 'Downloading and extracting buildroot #{RELEASE}'
 		wget -q -c http://buildroot.org/downloads/buildroot-#{RELEASE}.tar.gz
-		tar axf buildroot-#{RELEASE}.tar.gz"
+		tar axf buildroot-#{RELEASE}.tar.gz
+
+		echo 'Cloning cpython and linux repositories from git server'
+		git clone ssh://git@gitlab.pinet.home:5222/pykernel/cpython.git
+		git clone ssh://git@gitlab.pinet.home:5222/pykernel/linux.git
+		echo 'Done'"
 
 end
