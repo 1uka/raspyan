@@ -41,6 +41,8 @@ ac_cv_file__dev_ptc=no
 EOF
 ```
 
+Add all extra Python libraries from Lib in `Makefile.pre.in` to `LIBSUBDIRS`.
+
 Then, run the `configure` script:
 
 ```bash
