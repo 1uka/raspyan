@@ -43,13 +43,20 @@ Vagrant.configure('2') do |config|
 
 	config.vm.provision 'shell', privileged: true, inline:
 		"sed -i 's|deb http://us.archive.ubuntu.com/ubuntu/|deb mirror://mirrors.ubuntu.com/mirrors.txt|g' /etc/apt/sources.list
-		sed -i '192.168.0.3 gitlab.pinet.home' /etc/hosts
+		sed -i '$ a 192.168.0.3 gitlab.pinet.home' /etc/hosts
+		sed -i \
+			-e 's|^#\?deb-src http://archive.ubuntu.com/ubuntu bionic main restricted|deb-src http://archive.ubuntu.com/ubuntu bionic main restricted|' \
+			-e 's|^#\?deb-src http://archive.ubuntu.com/ubuntu bionic universe|deb-src http://archive.ubuntu.com/ubuntu bionic universe|' \
+			/etc/apt/sources.list 
 		dpkg --add-architecture i386
 		apt-get -q update
 		apt-get purge -q -y snapd lxcfs lxd ubuntu-core-launcher snap-confine
+		apt-get -q -y upgrade
 		apt-get -q -y install build-essential libncurses5-dev \
 			git bzr cvs mercurial subversion libc6:i386 unzip bc \
-			gcc-arm-linux-gnueabi
+			libffi-dev python3.7 python3.7-dev \
+			gcc-arm-linux-gnueabihf
+		apt-get build-dep python3.7
 		apt-get -q -y autoremove
 		apt-get -q -y clean
 		update-locale LC_ALL=C"
@@ -60,6 +67,11 @@ Vagrant.configure('2') do |config|
 		"echo 'Downloading and extracting buildroot #{RELEASE}'
 		wget -q -c http://buildroot.org/downloads/buildroot-#{RELEASE}.tar.gz
 		tar axf buildroot-#{RELEASE}.tar.gz
+
+        cat > ~/.ssh/config << EOF
+        Host gitlab.pinet.home
+            IdentityFile ~/.ssh/pykernel_deploy_key
+        EOF
 
 		echo 'Cloning cpython and linux repositories from git server'
 		git clone ssh://git@gitlab.pinet.home:5222/pykernel/cpython.git

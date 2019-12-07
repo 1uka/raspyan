@@ -44,5 +44,5 @@ EOF
 Then, run the `configure` script:
 
 ```bash
-CONFIG_SITE=config.site ./configure --host=arm-linux-gnueabi --build=x86_64-linux-gnu --disable-ipv6
+CONFIG_SITE=config.site ./configure --enable-shared --prefix=/usr --host=arm-linux-gnueabi --build=x86_64-linux-gnu --disable-ipv6
 ```
