@@ -13,4 +13,6 @@ A Linux kernel that boots into the Python interpreter.
 - [ ] Add/modify/remove a driver/module
 - [ ] Change init app (`/sbin/init`) to something else
 - [ ] Change main.c for python if needed, reseach what needs to be done first
+- [ ] Add Sentinel application and its dependencies to CPython
+- [ ] Modify build dependencies and build CPython with Sentinel
 

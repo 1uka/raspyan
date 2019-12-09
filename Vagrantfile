@@ -43,39 +43,44 @@ Vagrant.configure('2') do |config|
 
 	config.vm.provision 'shell', privileged: true, inline:
 		"sed -i 's|deb http://us.archive.ubuntu.com/ubuntu/|deb mirror://mirrors.ubuntu.com/mirrors.txt|g' /etc/apt/sources.list
-		sed -i '$ a 192.168.0.3 gitlab.pinet.home' /etc/hosts
 		sed -i \
 			-e 's|^#\?deb-src http://archive.ubuntu.com/ubuntu bionic main restricted|deb-src http://archive.ubuntu.com/ubuntu bionic main restricted|' \
 			-e 's|^#\?deb-src http://archive.ubuntu.com/ubuntu bionic universe|deb-src http://archive.ubuntu.com/ubuntu bionic universe|' \
 			/etc/apt/sources.list 
+		sed -i -e 's|^deb |deb \[arch=amd64,i386\] |g' -e 's|^deb-src |deb-src \[arch=amd64,i386\] |g' /etc/apt/sources.list
+		sed -i \
+			-e '$ a deb [arch=armhf] http://ports.ubuntu.com/ bionic main multiverse restricted universe' \
+			-e '$ a deb [arch=armhf] http://ports.ubuntu.com/ bionic-updates main multiverse restricted universe' \
+			-e '$ a deb-src [arch=armhf] http://ports.ubuntu.com/ bionic main multiverse restricted universe' \
+			-e '$ a deb-src [arch=armhf] http://ports.ubuntu.com/ bionic-updates main multiverse restricted universe' \
+			/etc/apt/sources.list
+		sed -i '$ a 192.168.0.3 gitlab.pinet.home' /etc/hosts
 		dpkg --add-architecture i386
 		apt-get -q update
 		apt-get purge -q -y snapd lxcfs lxd ubuntu-core-launcher snap-confine
 		apt-get -q -y upgrade
 		apt-get -q -y install build-essential libncurses5-dev \
 			git bzr cvs mercurial subversion libc6:i386 unzip bc \
-			libffi-dev python3.7 python3.7-dev \
-			gcc-arm-linux-gnueabihf
-		apt-get build-dep python3.7
+			libffi-dev libssl-dev python3.8 python3.8-dev \
+			gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+		apt-get install libssl-dev:armhf libffi-dev:armhf
+		apt-get build-dep python3.8
+		apt-get build-dep python3.8:armhf
 		apt-get -q -y autoremove
 		apt-get -q -y clean
 		update-locale LC_ALL=C"
-
-	config.vm.provision 'file', source: '~/.ssh/pykernel_deploy_key', destination: '$HOME/.ssh/pykernel_deploy_key'
 
 	config.vm.provision 'shell', privileged: false, inline:
 		"echo 'Downloading and extracting buildroot #{RELEASE}'
 		wget -q -c http://buildroot.org/downloads/buildroot-#{RELEASE}.tar.gz
 		tar axf buildroot-#{RELEASE}.tar.gz
-
-        cat > ~/.ssh/config << EOF
-        Host gitlab.pinet.home
-            IdentityFile ~/.ssh/pykernel_deploy_key
-        EOF
-
-		echo 'Cloning cpython and linux repositories from git server'
-		git clone ssh://git@gitlab.pinet.home:5222/pykernel/cpython.git
-		git clone ssh://git@gitlab.pinet.home:5222/pykernel/linux.git
+        
+		echo 'Cloning cpython from git'
+		git clone https://github.com/1uka/cpython.git
+		cd cpython
+		git checkout pykernel-integration
+		chmod +x crossbuild.sh
+		./crossbuild.sh -t arm-linux -a gnueabihf -o /vagrant
 		echo 'Done'"
 
 end
