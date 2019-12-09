@@ -54,18 +54,18 @@ Vagrant.configure('2') do |config|
 			-e '$ a deb-src [arch=armhf] http://ports.ubuntu.com/ bionic main multiverse restricted universe' \
 			-e '$ a deb-src [arch=armhf] http://ports.ubuntu.com/ bionic-updates main multiverse restricted universe' \
 			/etc/apt/sources.list
-		sed -i '$ a 192.168.0.3 gitlab.pinet.home' /etc/hosts
 		dpkg --add-architecture i386
+		dpkg --add-architecture armhf
 		apt-get -q update
 		apt-get purge -q -y snapd lxcfs lxd ubuntu-core-launcher snap-confine
 		apt-get -q -y upgrade
 		apt-get -q -y install build-essential libncurses5-dev \
 			git bzr cvs mercurial subversion libc6:i386 unzip bc \
 			libffi-dev libssl-dev python3.8 python3.8-dev \
-			gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-		apt-get install libssl-dev:armhf libffi-dev:armhf
-		apt-get build-dep python3.8
-		apt-get build-dep python3.8:armhf
+			binutils-multiarch gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+		apt-get -q -y install libssl-dev:armhf libffi-dev:armhf
+		apt-get -q -y build-dep python3.8
+		apt-get -q -y build-dep python3.8:armhf
 		apt-get -q -y autoremove
 		apt-get -q -y clean
 		update-locale LC_ALL=C"
@@ -74,7 +74,6 @@ Vagrant.configure('2') do |config|
 		"echo 'Downloading and extracting buildroot #{RELEASE}'
 		wget -q -c http://buildroot.org/downloads/buildroot-#{RELEASE}.tar.gz
 		tar axf buildroot-#{RELEASE}.tar.gz
-        
 		echo 'Cloning cpython from git'
 		git clone https://github.com/1uka/cpython.git
 		cd cpython
