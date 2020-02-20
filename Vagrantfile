@@ -5,7 +5,9 @@
 ################################################################################
 
 # Buildroot version to use
-RELEASE='2019.11'
+BUILDROOT_RELEASE='2019.11'
+PYVERSION='3.7'
+PYTHON="python#{PYVERSION}"
 
 ### Change here for more memory/cores ###
 VM_MEMORY=2048
@@ -33,11 +35,11 @@ Vagrant.configure('2') do |config|
 		s.inline = 'echo Setting up machine name'
 
 		config.vm.provider :vmware_fusion do |v, override|
-			v.vmx['displayname'] = "Pykernel Buildroot #{RELEASE}"
+			v.vmx['displayname'] = "Pykernel Buildroot"
 		end
 
 		config.vm.provider :virtualbox do |v, override|
-			v.name = "Pykernel Buildroot #{RELEASE}"
+			v.name = "Pykernel Buildroot"
 		end
 	end
 
@@ -61,25 +63,30 @@ Vagrant.configure('2') do |config|
 		apt-get -q -y upgrade
 		apt-get -q -y install build-essential libncurses5-dev \
 			git bzr cvs mercurial subversion libc6:i386 unzip bc \
-			libffi-dev libssl-dev python3.8 python3.8-dev \
+			libffi-dev libssl-dev #{PYTHON} #{PYTHON}-dev \
 			binutils-multiarch gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-		apt-get -q -y install libssl-dev:armhf libffi-dev:armhf
-		apt-get -q -y build-dep python3.8
-		apt-get -q -y build-dep python3.8:armhf
+		apt-get -q -y install libssl-dev:armhf libffi-dev:armhf \
+			liblzma-dev:armhf libbz2-dev:armhf libgdbm-dev:armhf \
+			libreadline-dev:armhf libsqlite3-dev:armhf zlib1g-dev:armhf \
+			uuid-dev:armhf tk-dev:armhf libncurses5-dev:armhf
+		apt-get -q -y build-dep #{PYTHON}
+		apt-get -q -y build-dep #{PYTHON}:armhf
 		apt-get -q -y autoremove
 		apt-get -q -y clean
 		update-locale LC_ALL=C"
 
 	config.vm.provision 'shell', privileged: false, inline:
-		"echo 'Downloading and extracting buildroot #{RELEASE}'
-		wget -q -c http://buildroot.org/downloads/buildroot-#{RELEASE}.tar.gz
-		tar axf buildroot-#{RELEASE}.tar.gz
+		"echo 'Downloading and extracting buildroot #{BUILDROOT_RELEASE}'
+		wget -q -c http://buildroot.org/downloads/buildroot-#{BUILDROOT_RELEASE}.tar.gz
+		tar axf buildroot-#{BUILDROOT_RELEASE}.tar.gz
 		echo 'Cloning cpython from git'
 		git clone https://github.com/1uka/cpython.git
 		cd cpython
-		git checkout pykernel-integration
+		git checkout pykernel-#{PYVERSION}-integration
 		chmod +x crossbuild.sh
-		./crossbuild.sh -t arm-linux -a gnueabihf -o /vagrant
+        mkdir #{PYTHON}-build
+		./crossbuild.sh -t arm-linux -a gnueabihf -o /tmp/#{PYTHON}-build
+        mv /tmp/#{PYTHON}-build/#{PYTHON}-arm-linux-gnueabihf.tar.gz /vagrant/
 		echo 'Done'"
 
 end
