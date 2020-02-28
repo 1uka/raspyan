@@ -1,25 +1,30 @@
 #!/bin/sh
 
-BR_RELEASE=$1
-BR_CONFIG=$2
+DEFCONFIG=$1
 
-echo "Downloading and extracting buildroot ${BR_RELEASE}"
-wget -q -c http://buildroot.org/downloads/buildroot-${BR_RELEASE}.tar.gz
-tar axf buildroot-${BR_RELEASE}.tar.gz
+echo "Starting pykernel build"
 
-echo 'Starting buildroot automated kernel build'
-cd buildroot-${BR_RELEASE}
-
-if [ -f "$HOME/$BR_CONFIG" ]; then
-    cp $HOME/$BR_CONFIG .config
-elif [ -f "configs/$BR_CONFIG" ]; then
-    make $BR_CONFIG
-else
-    echo "Invalid configuration file argument: ${BR_CONFIG}"
+if [ ! -d "/vagrant/buildroot" ]; then
+    echo "Buildroot must be present at shared folder root! (/vagrant/buildroot)"
     exit 1
 fi
 
-make
-mv output /vagrant/output
+echo "Copying buildroot directory from shared folder to $HOME/buildroot..."
+cp -R /vagrant/buildroot $HOME/buildroot
 
-echo 'Done. Output from build root can be found at /vagrant/'
+cd $HOME/buildroot
+echo 'Starting buildroot build process'
+tstart=`date +%s`
+
+make $DEFCONFIG
+make
+
+mkdir /vagrant/output
+cp -R output/images /vagrant/output/images
+
+tend=`date +%s`
+runtime=$((tend - tstart))
+
+echo "Build finished."
+echo "Time elapsed: ${runtime} seconds"
+echo "Output from build root can be found at /vagrant/output"

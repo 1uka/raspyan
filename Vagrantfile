@@ -4,9 +4,7 @@
 #
 ################################################################################
 
-# Buildroot version to use
-BUILDROOT_RELEASE='2019.11'
-BUILDROOT_CONFIG='pykernel_qemu_arm_versatile'
+BUILDROOT_DEFCONFIG='raspberrypi2_raspyan_defconfig'
 PYVERSION='3.7'
 PYTHON="python#{PYVERSION}"
 
@@ -32,7 +30,7 @@ Vagrant.configure('2') do |config|
 		end
 	end
 
-	config.vm.provision 'shell' do |s|
+	config.vm.provision :shell do |s|
 		s.inline = 'echo Setting up machine name'
 
 		config.vm.provider :vmware_fusion do |v, override|
@@ -44,9 +42,8 @@ Vagrant.configure('2') do |config|
 		end
 	end
 
-	config.vm.provision "file", source: "configs/#{BUILDROOT_CONFIG}", destination: "$HOME/#{BUILDROOT_CONFIG}"
-	config.vm.provision 'shell', privileged: true, path: "provision/setup.sh", args: "#{PYTHON} #{BUILDROOT_RELEASE}"
-	config.vm.provision 'shell', privileged: false, path: "provision/build.sh", args: "#{BUILDROOT_RELEASE} #{BUILDROOT_CONFIG}"
-	# config.vm.provision 'shell', privileged: false, path: "provision/build_cpython.sh", args: "#{PYVERSION} #{PYTHON}"
+	config.vm.provision :shell, path: "provision/setup.sh", args: "#{PYTHON}", privileged: true
+	config.vm.provision :shell, path: "provision/build.sh", args: "#{BUILDROOT_DEFCONFIG}", privileged: false
+	# config.vm.provision :shell, privileged: false, path: "provision/build_cpython.sh", args: "#{PYVERSION} #{PYTHON}"
 
 end
