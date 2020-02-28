@@ -2,7 +2,7 @@
 
 DEFCONFIG=$1
 
-echo "Starting pykernel build"
+echo "Starting raspyan build"
 
 if [ ! -d "/vagrant/buildroot" ]; then
     echo "Buildroot must be present at shared folder root! (/vagrant/buildroot)"

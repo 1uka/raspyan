@@ -1,6 +1,6 @@
-# PyKernel
+# Raspyan
 
-PyKernel is a minimal Linux kernel that boots into the python interpreter, instead of booting into command line.
+Raspyan is a minimal Linux kernel for Raspberry Pi 2 that boots into the python interpreter, instead of booting into command line.
 
 ## Build
 
