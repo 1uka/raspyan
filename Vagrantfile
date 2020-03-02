@@ -5,12 +5,10 @@
 ################################################################################
 
 BUILDROOT_DEFCONFIG='raspberrypi2_raspyan_defconfig'
-PYVERSION='3.7'
-PYTHON="python#{PYVERSION}"
 
 ### Change here for more memory/cores ###
 VM_MEMORY=2048
-VM_CORES=1
+VM_CORES=2
 
 Vagrant.configure('2') do |config|
 	config.vm.box = 'ubuntu/bionic64'
@@ -42,8 +40,7 @@ Vagrant.configure('2') do |config|
 		end
 	end
 
-	config.vm.provision :shell, path: "provision/setup.sh", args: "#{PYTHON}", privileged: true
+	config.vm.provision :shell, path: "provision/setup.sh", privileged: true
 	config.vm.provision :shell, path: "provision/build.sh", args: "#{BUILDROOT_DEFCONFIG}", privileged: false
-	# config.vm.provision :shell, privileged: false, path: "provision/build_cpython.sh", args: "#{PYVERSION} #{PYTHON}"
 
 end

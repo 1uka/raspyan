@@ -5,4 +5,13 @@ if ! command -v qemu-system-arm >/dev/null 2>&1; then
     exit 1
 fi
 
-qemu-system-arm -vga cirrus -M raspi2 -kernel output/images/zImage -dtb output/images/versatile-pb.dtb -drive file=output/images/rootfs.ext2,if=virtio,format=raw,id=hd0 -device virtio-gpu-pci -append "rootwait root=/dev/sda console=ttyAMA0,115200" -serial stdio -net nic,model=rtl8139 -net user
+qemu-system-arm \
+    -M raspi2 \
+    -m 256 \
+    -kernel output/images/zImage \
+    -dtb output/images/bcm2709-rpi-2-b.dtb \
+    -drive file=output/images/rootfs.ext2,format=raw,id=sd0 \
+    -append "root=/dev/mmcblk0 rootwait console=tty1 console=ttyAMA0,115200" \
+    -serial stdio \
+    -net user \
+    -no-reboot
