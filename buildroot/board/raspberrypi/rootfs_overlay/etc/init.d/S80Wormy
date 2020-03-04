@@ -1,4 +1,40 @@
 #!/bin/sh
+#
+# Starts Wormy game
+#
 
-echo "Starting wormy game..."
-/usr/bin/wormy
+BIN=/usr/bin/wormy
+PIDFILE=/var/run/wormy.pid
+
+start() {
+    printf "Starting Wormy..."
+    start-stop-daemon -S -q -b -m -p $PIDFILE --exec $BIN
+    [ $? = 0 ] && sleep 3 && echo "OK" || echo "FAIL"
+}
+
+stop() {
+    printf "Stopping Wormy..."
+    start-stop-daemon -K -q -p $PIDFILE
+    [ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+restart() {
+    stop
+    sleep 3
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload)
+        restart
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

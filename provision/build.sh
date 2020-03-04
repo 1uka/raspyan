@@ -19,8 +19,7 @@ tstart=`date +%s`
 make $DEFCONFIG
 make
 
-mkdir /vagrant/output
-cp -R output/images /vagrant/output/images
+tar -czf /vagrant/raspyan-build-`date +%Y.%m.%d`.tar.gz output/images/
 
 tend=`date +%s`
 runtime=$((tend - tstart))
