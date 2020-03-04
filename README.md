@@ -19,9 +19,9 @@ cross-compiling toolchain and the kernel look like, and what are the possibiliti
 Also, it can serve as a guide to anyone starting out in the embedded Linux field,
 and as an introduction to the basic concepts of the Linux kernel.
 
-The Raspyan project was developed as a seminar assignment for the "Operating Systems, Modules and
-Drivers for Embedded Systems" course at the Faculty of Electrical Engineering and Information
-Technologies in Skopje, under the supervision of Prof. Dr. Marija Kalendar.
+The Raspyan project was developed as a seminar assignment for the *"Operating Systems, Modules and
+Drivers for Embedded Systems"* course at the ***Faculty of Electrical Engineering and Information
+Technologies*** in Skopje, under the mentorship of **Prof. Dr. Marija Kalendar**.
 
 ## Requirements
 
@@ -63,7 +63,7 @@ explaining the various cross-compilation toolchain configuration options.
 
 ### System Configuration
 
-You can tweak some system preferences, such as the host name, the password for the root used, overlay directories etc.
+You can tweak some system preferences, such as the host name, the password for the root user, overlay directories etc.
 For Raspyan, the host name is `raspyan` and the default root password is `toor`.
 Most importantly, in order to add the sources for the wormy game and its `init` script,
 the path to the root filesystem overlay directory containing these files and their locations
@@ -74,6 +74,25 @@ must be specified here.
 
 You can read more about overlay directories and other methods of customizing the root filesystem
 from [this section](https://buildroot.org/downloads/manual/manual.html#rootfs-custom) of the buildroot documentation.
+
+#### Overlay
+
+The root filesystem overlay can be found [here](buildroot/board/raspberrypi/rootfs_overlay/),
+with the following structure:
+
+```text
+buildroot/board/raspberrypi/rootfs_overlay/
+  -- usr/bin/
+    -- wormy
+  -- etc/init.d/
+    -- S80Wormy
+```
+
+These files will be installed on the target filesystem at the appropriate locations, for example `wormy`
+will be installed at `/usr/bin/wormy`. The files in the `rootfs_overlay` must have the correct
+permissions - both must be executable. Otherwise the init system won't be able to run the
+[init daemon](buildroot/board/raspberrypi/rootfs_overlay/etc/init.d/S80Wormy), nor will the init daemon script
+be able to run the [wormy game](buildroot/board/raspberrypi/rootfs_overlay/usr/bin/wormy).
 
 ### Target Packages
 
@@ -130,7 +149,7 @@ on the vagrant guest machine.
 
 ## Usage
 
-After installing the [requirements](##Requirements) and making sure there is enough space on
+After installing the [requirements](#Requirements) and making sure there is enough space on
 the host machine, get the [Vagrantfile](Vagrantfile), along with [buildroot](buildroot/) from this repository.
 The easiest way is to simply clone the repository:
 
@@ -148,7 +167,7 @@ After the build finishes, the build output is compressed in a tarball that can b
 at the project root directory (in the same directory as the `Vagrantfile`).
 
 For more information about the contents of the build output, how to use the generated kernel,
-filesystem and SDcard image check out the ["readme"](buildroot/board/raspberrypi2/readme.txt)
+filesystem and SDcard image check out the ["readme"](buildroot/board/raspberrypi/readme.txt)
 for the Raspberry Pi board under buildroot.
 
 ### QEMU
