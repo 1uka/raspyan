@@ -177,10 +177,25 @@ Requirements:
 - [QEMU](https://www.qemu.org) emulator version 4.2.0
 
 For testing purposes, and just to check out that the newly built kernel simply boots and works
-as intended, the system can be emulated using `qemu-system-arm`'s `raspi2` machine. Unfortunately,
-at the time of writing the `raspi2` machine does not emulate USB ports, and thus it is not possible
-to "connect" a mouse and keyboard. So, you will be able to see the Wormy game window, but
-you won't be able to play inside QEMU.
+as intended, the system can be emulated using `qemu-system-arm`'s `versatilepb` machine.
+
+You can build a Linux kernel configured with required options for running on
+virtualized harware by setting the buildroot configuration file to
+[`qemu_arm_versatile_raspyan_defconfig`](buildroot/configs/qemu_arm_versatile_raspyan_defconfig):
+
+```bash
+export BR2_DEFCONFIG=qemu_arm_versatile_raspyan_defconfig
+vagrant up
+```
+
+Or, if the Vagrant machine is already up:
+
+```bash
+vagrant ssh
+cd $HOME/buildroot
+make qemu_arm_versatile_raspyan_defconfig
+make
+```
 
 To run QEMU, use the provided [qemu.sh](qemu.sh) shell script. Make sure that the build output
 is untarred in the project root directory, since the script expects to find it there.
