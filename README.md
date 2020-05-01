@@ -34,10 +34,23 @@ Technologies*** in Skopje, under the mentorship of **Prof. Dr. Marija Kalendar**
 Normally, Linux kernels must be built/compiled on a Linux host operating system.
 There are also a lot of other requirements that would need to be installed on the host,
 such as a cross-compiling toolchain to compile for different architectures, libraries, etc.
+
 To simplify this, the Raspyan project uses **Vagrant** for automating
 the creation and provisioning of a Linux virtual machine that will be used for building.
 Vagrant depends on a virtualization provider; it is recommended to use
 **VirtualBox** for this purpose.
+
+Virtual machines can be configured using a `Vagrantfile` - a Ruby script with specific
+configuration features. From a `Vagrantfile`, the user can setup a virtual machine by
+running provisioning scripts, copying files from the host, installing dependencies, etc.
+The `Vagrantfile` script is not platform-dependent and can be used for automating builds,
+deployments on the cloud. Wherever it runs the same outcome can be expected, as long as
+the Vagrant version is consistent across the systems.
+
+So, there are a couple advantages to using Vagrant:
+
+- the user does not have to run Linux - any OS that is supported by Vagrant can be used;
+- useful for automated deployments
 
 ## Configuration
 
